@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.util.Scanner;
 
 
 public class MainMiddleware {
@@ -9,6 +12,8 @@ public class MainMiddleware {
 	public static void main (String[] argv) throws RemoteException
 	{
 		RmiMiddleware rm = new RmiMiddleware();
+		ServerMessageInterface server;
+		String host;
 		int choice;
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -17,6 +22,7 @@ public class MainMiddleware {
 		System.out.println("Middleware para administrar os números de servidores. Para sair digite \"\\quit\"");
 		//Statement stm;
 		//PostgresConn banco = PostgresConn.getInstance("client", "client");
+		Scanner sc = new Scanner(System.in);
 		
 		while(true)
 		{
@@ -26,37 +32,59 @@ public class MainMiddleware {
 				System.out.println("3 para verificar status de um servidor:");
 				System.out.println("4 para sair :");
 				
-				try {
-					
-					choice = System.in.read();
-					switch (choice) 
-					{
-					
-					case 1:
-						System.out.println("Digite o endereço ip do servidor corretamente. (Ex: 192.168.123.110)");
-						rm.addServer(br.readLine());
-						
-						break;
-					case 2:
-						System.out.println("Digite o endereço ip do servidor corretamente. (Ex: 192.168.123.110");
-						rm.removeServer(br.readLine());
-						break;
-					case 3:
-						System.out.println("Digite o endereço ip do servidor corretamente. (Ex: 192.168.123.110");
-						if(rm.checkStatusServer(br.readLine()))
-							System.out.println("Servidor está funcionando corretamente");
-						else
-							System.out.println("Servidor não está funcionando corretamente");
-						break;
-					//case 4: System.out.println("Você escolheu sair do middleware");
-						//System.exit(0);
-						//break;
-
-					default: System.out.println("voce escolheu uma opção inválida"); break;
+				choice = sc.nextInt();
+				switch (choice) 
+				{
+				
+				case 1:
+					System.out.println("Digite o endereço ip que deseja adicionar. (Ex: 192.168.123.110)");
+					try {
+						host = sc.next();
+						rm.registry = LocateRegistry.getRegistry(host, rm.serverPort);
+						server = (ServerMessageInterface) rm.registry.lookup("rmiServer");
+						rm.addServer(server);
+						System.out.println("Servidor adicionado com sucesso");
 					}
-				} catch (IOException e) {
-					System.out.println("Não foi possível fazer a leitura correta do seu teclado. Por favor digite corretamente");
-					//e.printStackTrace();
+					catch(RemoteException | NotBoundException e)
+					{
+						System.out.println("Há algum problema de conexão por favor verifique a o servidor ou a conexão.");
+					}
+					
+					
+					break;
+				case 2://
+					System.out.println("Digite o endereço ip que deseja remover. (Ex: 192.168.123.110");
+					
+					try {
+						host = sc.next();
+						rm.registry = LocateRegistry.getRegistry(host, rm.serverPort);
+						server = (ServerMessageInterface) rm.registry.lookup("rmiServer");
+						rm.removeServer(server);
+						System.out.println("Servidor removido com sucesso");
+					}
+					catch(RemoteException | NotBoundException e)
+					{
+						System.out.println("Há algum problema de conexão por favor verifique a o servidor ou a conexão.");
+					}
+					break;
+				case 3:
+					System.out.println("Digite o endereço ip do servidor corretamente. (Ex: 192.168.123.110");
+					host = sc.next();
+					if(rm.checkStatusServer(host))
+						System.out.println("Servidor está funcionando corretamente.");
+					else
+						System.out.println("Servidor não está funcionando corretamente, por favor verifique a aplicação");
+					break;
+//				case 4: System.out.println("Você escolheu sair do middleware");
+//				for (String s : rm.hostServers)
+//				{
+//					System.out.println(s);
+//				}
+//				System.out.println("Lider: "+rm.liderServerAddress);
+//					
+//					break;
+
+				default: System.out.println("voce escolheu uma opção inválida"); break;
 				}
 				
 //				rm.registry = LocateRegistry.getRegistry(c.middlewareAddress, c.middlewarePort);

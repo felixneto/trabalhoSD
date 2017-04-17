@@ -13,29 +13,19 @@ import java.net.*;
 
 public class RmiServer implements ServerMessageInterface {
 
-	public String serverAddress = "127.0.0.1"; // localhost
+	public String serverAddress;
 	private int serverPort = 3434;
-	public String middlewareAddress = "127.0.0.1"; // localhost
+	public String middlewareAddress; // localhost
 	private int middlewarePort = 3232;
+	private int priority;
 	public ReceiveMessageInterface rmiMiddleware;
 	public ServerMessageInterface rmiServer;
 	int Port = 3434;
-	static String name;
 	Registry registry; // rmi registry for lookup the remote objects.
 
 	public RmiServer() throws Exception {
-		// try {
-		// // get the address of this host.
-		// //thisAddress = (InetAddress.getLocalHost()).toString();
-		// } catch (Exception e) {
-		// throw new RemoteException("can't get inet address.");
-		// }
-		// this port(registry�s port)
-		// System.out.println("this address=" + thisAddress + ",port=" +
-		// thisPort);
+
 		try {
-			// create the registry and bind the name and object.
-			serverAddress = (InetAddress.getLocalHost()).toString();
 			registry = LocateRegistry.createRegistry(serverPort);
 			registry.rebind("rmiServer", this);
 			// ReceiveMessageInterface rMI = (ReceiveMessageInterface)
@@ -47,11 +37,13 @@ public class RmiServer implements ServerMessageInterface {
 	}
 
 	@Override
-	public void receiveMessageServer(String command, String address,
-			ArrayList<String> hosts) throws RemoteException {
+	public String serverReceiveMessage(String command, String address,
+			ArrayList<ServerMessageInterface> hosts) throws RemoteException {
+		//Se o servidor receber uma lista nula significa que ele não é o líder
+		// Sendo assim ele armazena as respostas dos outros servidores
 		if (hosts != null) {
-			for (String host : hosts) {
-				registry = LocateRegistry.getRegistry(host, serverPort);
+			for (ServerMessageInterface host : hosts) {
+				registry = LocateRegistry.getRegistry(host.getAddress(), serverPort);
 				try {
 					rmiServer = (ServerMessageInterface) (registry
 							.lookup("rmiServer"));
@@ -59,22 +51,48 @@ public class RmiServer implements ServerMessageInterface {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				rmiServer.receiveMessageServer(command, serverAddress, null);
+				//rmiServer.receiveMessageServer(command, serverAddress, null);
 			}
 
-		} else {
-			Connection conn = PostgresConn.getInstance("client", "client")
-					.getConnection();
-
-			try {
-				Statement stm = PostgresConn.getInstance("client", "client")
-						.getConnection().createStatement();
-				stm.execute(command);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			// TODO Auto-generated method stub
 		}
+
+		Connection conn = PostgresConn.getInstance("client", "client")
+				.getConnection();
+
+		try {
+			Statement stm = PostgresConn.getInstance("client", "client")
+					.getConnection().createStatement();
+			stm.execute(command);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean getStatus() throws RemoteException {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public int getPriority() throws RemoteException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setPriority(int priority) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getAddress() throws RemoteException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

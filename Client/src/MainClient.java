@@ -10,7 +10,7 @@ public class MainClient {
 	
 	public static void main (String[] argv) throws RemoteException
 	{
-		Cliente c = new Cliente();
+		RmiCliente c = new RmiCliente();
 		
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
