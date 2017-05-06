@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.*;
 
-public class RmiServer implements ServerMessageInterface {
+public class RmiServer implements ServerMessageInterface, Serializable {
 
 	public String serverAddress;
 	private int serverPort = 3434;

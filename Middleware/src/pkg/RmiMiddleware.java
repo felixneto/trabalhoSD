@@ -1,3 +1,4 @@
+package pkg;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.UnicastRemoteObject;
@@ -13,6 +14,10 @@ import java.net.*;
 import java.net.UnknownHostException;
 
 public class RmiMiddleware implements MiddlewareMessageInterface, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int status[];
 	private int priority[];
 	public String clientAddress; // localhost
@@ -22,7 +27,7 @@ public class RmiMiddleware implements MiddlewareMessageInterface, Serializable {
 	public ClientMessageInterface rmiClient;
 	public ServerMessageInterface rmiServer;
 	public int serverPort = 3434;
-	public ServerMessageInterface Server;
+	public RmiServer Server;
 	public int liderServerPosition;
 	public ArrayList<ServerMessageInterface> hostServers;
 	public Registry registry;
