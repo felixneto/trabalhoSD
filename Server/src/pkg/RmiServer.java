@@ -1,3 +1,4 @@
+package pkg;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
@@ -11,8 +12,12 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.*;
 
-public class RmiServer implements ServerMessageInterface, Serializable {
+public class RmiServer implements  Remote, Serializable  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String serverAddress;
 	private int serverPort = 3434;
 	public String middlewareAddress; // localhost
@@ -37,13 +42,13 @@ public class RmiServer implements ServerMessageInterface, Serializable {
 		}
 	}
 
-	@Override
+	
 	public String serverReceiveMessage(String command, String address,
-			ArrayList<ServerMessageInterface> hosts) throws RemoteException {
+			ArrayList<RmiServer> hosts) throws RemoteException {
 		//Se o servidor receber uma lista nula significa que ele não é o líder
 		// Sendo assim ele armazena as respostas dos outros servidores
 		if (hosts != null) {
-			for (ServerMessageInterface host : hosts) {
+			for (RmiServer host : hosts) {
 				registry = LocateRegistry.getRegistry(host.getAddress(), serverPort);
 				try {
 					rmiServer = (ServerMessageInterface) (registry
@@ -73,25 +78,25 @@ public class RmiServer implements ServerMessageInterface, Serializable {
 
 	}
 
-	@Override
+	
 	public boolean getStatus() throws RemoteException {
 		// TODO Auto-generated method stub
 		return true;
 	}
 
-	@Override
+	
 	public int getPriority() throws RemoteException {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
+	
 	public void setPriority(int priority) throws RemoteException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public String getAddress() throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
